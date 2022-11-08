@@ -1,0 +1,164 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "179579ff",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    " val dataset=spark.read.format(\"csv\").option(\"inferSchema\",true).option(\"path\",\"file:///home/itv003334/dataset1\").load()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "75ff58bd",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "val df1=dataset.toDF(\"name\",\"age\",\"city\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "f7d2544e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df1.printSchema()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b861db6a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "case class orders(name:String,age:Int,city:String)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "d6e0fc68",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "val df2=df1.as[orders]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "68eaf26f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df2.printSchema()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "2c7d9dae",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    " def ageCheck(age:Int):String={\n",
+    "     if(age>18) \"Y\" else \"N\"\n",
+    " }"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ccd8d78c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    " import org.apache.spark.sql.functions._"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "8feb98d0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    " import org.apache.spark.sql.functions.udf"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "8dff9b2f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "udf(ageCheck(_:Int):String)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "c501419a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "val age_verify=df2.withColumn(\"adult\",ageCheck(\"age\"))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "bd524546",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "val check_age=udf(ageCheck(_:Int):String)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "3cf655f6",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "val age_verify=df2.withColumn(\"adult\",check_age(column(colName=\"age\"))\n",
+    "     | )"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "fc613085",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "// registering the function with spark sql\n"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Spark 2 - Scala",
+   "language": "scala",
+   "name": "spark_2_scala"
+  },
+  "language_info": {
+   "codemirror_mode": "text/x-scala",
+   "file_extension": ".scala",
+   "mimetype": "text/x-scala",
+   "name": "scala",
+   "pygments_lexer": "scala",
+   "version": "2.11.12"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
