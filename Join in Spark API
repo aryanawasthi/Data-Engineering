@@ -1,0 +1,11 @@
+// loading the data in structured api dataframe for order table
+val ordersdf=spark.read.format("csv").option("header",true).option("inferSchema",true).option("path","file:///home/itv003334/orders.csv").load()
+// loading the data in apache spark of orders table
+val customerdf=spark.read.format("csv").option("header",true).option("inferSchema",true).option("path","file:///home/itv003334/customers.csv").load()
+// join condition on which join is performed
+val joinCondition=ordersdf.col("order_customer_id")===customerdf.col("customer_id")
+// type of join
+val joinType="outer"
+// join command using 3 parameter
+val joineddf=ordersdf.join(customerdf,joinCondition,joinType)
+
