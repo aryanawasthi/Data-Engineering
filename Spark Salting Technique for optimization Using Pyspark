@@ -1,0 +1,26 @@
+#pyspark code for using the salting algorithm to increase the cardinality and therby performace of the Executors
+
+# defing a random generator function which generated a random number between a range of 1 to 60
+import random
+def random_gen():
+	return random.randint(1,60)
+	
+def myFunction(x):
+	if x[0][0:4]=="WARN":
+		return ("WARN",x[2])
+	else:
+		return ("ERROR",x[2])
+		
+	
+# laoding the file using SparkContext	
+rdd1=sc.textFile("biglognew")
+#splitting the data on the basis of : and adding the random number to the logging status column for e.g ERROR1, ERROR31
+rdd3=rdd1.map(lambda x: (x.split(":")[0]+str(random_gen),x.split(":")[1]))
+# Groupin the data based on same keys
+rdd4=rdd3.groupByKey()
+# removing the string from the key finding only the length for e.g input is ("ERROR1","Thu ...","Fri ...."),,("ERROR11",4)
+rdd5=rdd4.map(lambda x:(x[0][,len(x[1])))
+#removing the excessive characters from the logging status for e.g ("ERROR1",1),("ERROR13",3) -- (ERROR,1),(ERROR,3)
+rdd6=rdd5.map(lambda x:myFunction(x))
+# collecting the results
+rdd6.collect()
