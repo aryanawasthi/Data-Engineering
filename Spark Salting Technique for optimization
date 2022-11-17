@@ -1,0 +1,43 @@
+spark2-shell \
+--master yarn \
+--num-executors 10 \
+--executor-cores 2 \
+--executor-memory 3G
+
+// using the salting metods to increase the peroformance enhancements
+// importing the random function to generate a random number
+val random=new scala.util.Random
+// initializing a start variable
+val start=1
+// initializing the end variable 
+val end=100
+//val num=start+random.nextInt((end-start)+1)
+// loading the text file using rdd
+val data=sc.textFile("bigLogNew.txt")
+// adding the random number with the keys to disintegrate the cluster by adding a radom number to the key value 
+val mapped_data=data.map(x=>{
+// using the map function as we have each line as input
+val num=start+random.nextInt((end-start)+1)
+// creating a radom number
+(x.split(":")(0)+num,x.split(":")(1))
+// outputting the value ("ERROR1","...")
+})
+// grouping the data based on key
+val group_data=mapped_data.groupByKey
+// finding the size of the data
+val destring_data=group_data.map(x=>(x._1,x._2.size))
+// removing the string
+
+val clear_data=destring_data.map(x=>{
+// matching the starting 4 strings and if it is equal outputting the tuple
+if(x._1.substring(0,4)=="WARN")
+("WARN",x._2)
+else
+("ERROR",x._2)
+})
+// adding all the values such that ("ERRROR",1),("ERROR",3)=>("ERROR",4)
+val reduced_data=clear_data.reduceByKey(_+_)
+// collecting the output data
+reduced_data.collect.foreach(println)
+
+
