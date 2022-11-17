@@ -1,0 +1,13 @@
+#pyspark code for finding the loggging status of the file when the file size is very big
+# loading the text file 
+rdd1=sc.textFile("biglognew")
+# using the lambda function to split the logging level
+# input ("ERROR: 11 Jan 2022 00" ---- ("ERROR","11 Jan, 2022")
+rdd3=rdd1.map(lambda x: (x.split(":")[0],x.split(":")[1]))
+# grouping the same data together 
+
+rdd4=rdd3.groupByKey()
+# finding the count of enteries for same logging level
+rdd5=rdd4.map(lambda x:(x[0],len(x[1])))
+# collecting the results
+rdd5.collect()
