@@ -1,0 +1,48 @@
+// writing the spark Configuration
+spark2-shell \
+--master yarn \
+--conf spark.dynamicAllocation.enabled=false \
+--num-executors 10 \
+--executor-memory 2G
+
+// spark code to execute for the scala
+
+val rdd1=sc.textFile("biglognew")
+val rdd2=rdd1.map(x=>(x.split(":")(0),x.split(":")(1)))
+val a=Array(("ERROR",0),("WARN",1))
+// restricting the broadcast join
+spark.conf.set("spark.sql.autoBroadcastJoinThreshold",-1)
+val rdd3=sc.parallelize(a)
+val rdd4 =rdd2.join(rdd3)
+rdd4.saveAsTextFile("output")
+
+
+// spark code when we use broadcast join as it is a default join
+val rdd1=sc.textFile("biglognew"
+al rdd2=rdd1.map(x=>(x.split(":")(0),x.split(":")(1)))
+val rdd3=sc.parallelize(a)
+val rdd4 =rdd2.join(rdd3)
+rdd4.saveAsTextFile("output")
+
+Here time taken is very s
+
+
+
+
+//pyspark code
+pyspark \
+--master yarn \
+--conf spark.dynamicAllocation.enabled=false \
+--num-executors 10 \
+--executor-memory 2G
+
+
+rdd1=sc.textFile("biglognew")
+rdd2=rdd1.map(lambda x:(x.split(":")[0],x.split(":")[1]))
+a=List[("ERROR",0),("WARN",1)]
+rdd3=sc.parallelize(a)
+rdd4 =rdd2.join(rdd3)
+rdd4.saveAsTextFile("new_output")
+
+git remote add origin "https:gg
+git remote add origin git@github.com:aryanawasthi/Data-Engineering.git
