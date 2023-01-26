@@ -1,0 +1,184 @@
+Police Dataset
+The Data from a Police Check Post is given.
+
+This data as a CSV file . We are going to analysze this data set using the pandas dataframe.
+
+import pandas as pd
+data=pd.read_csv("/home/aryan/Jupyter/3. Police Data.csv")
+
+data.head()
+
+Instrctions for Data Cleaning
+
+1. Removing the columns that only contains missing  values.
+
+data.isnull().sum()
+# as we can see that the  country_name column does not have any value.
+
+data.drop(columns='country_name',inplace=True)
+
+2. For Speeding , were Men or Women stooped more often?
+df[columns==value].value_counts()
+
+# to find whether the men or women ir stooped more often we need to work with two columns one is violation other is driver_gender
+
+data.head()
+data[data["violation"]=="Speeding"].driver_gender.value_counts()
+
+3. Does gender affect who get searched during a stop more?
+
+
+# to find for whether the search is conducted we will use that
+data.groupby("driver_gender").search_conducted.sum()
+
+Question (Mapping +Data type casting)
+
+4. What is the mean_stop_duration?
+
+# as we can see stop duration column has  values in string 
+data.stop_duration.value_counts()
+
+# first we have to convert this string into a integer value using a map function.
+data["stop_duration"]=data.stop_duration.map({'0-15 Min':7.5,"16-30 Min":24,"30+ Min":45})
+
+data.stop_duration.mean()
+
+5. Compare the age distributions for each violation.
+
+group the data by violations and use the columns for violations and describe.
+
+# for finding the distribution of age we will use the describe function on it.
+data.head()
+
+data.groupby("violation").driver_age.describe()
+
+Using the Pyspark for the same Operations
+
+
+import pyspark
+from pyspark.sql import SparkSession
+spark=SparkSession.builder.master("local[*]").appName("first").getOrCreate()
+
+data=spark.read.format("csv").option("path","/home/aryan/Jupyter/3. Police Data.csv").option("header",True).option("inferSchema",True).load()
+
+data.count()
+len(data.columns)
+data.count()
+
+# find how many null values are in a particular columns
+from pyspark.sql.functions import col
+new_data=data.drop(col("country_name"))
+new_data.columns
+
+For Speeding , were Men or Women stooped more often? df[columns==value].value_counts()
+
+new_data.take(10)
+
+new_data.columns
+
+from pyspark.sql.functions import col
+data_two=new_data.filter(col("violation")=="Speeding").groupby(col("driver_gender")).count().collect()
+
+3. Does gender affect who get searched during a stop more?
+
+new_data.filter(col("search_conducted")==True).groupby("driver_gender").count().collect()
+
+What is the mean_stop_duration?
+
+new_data.groupby("stop_duration").count().collect()
+
+def convert_data(x):
+    if x=='0-15 Min':
+        return 7.5
+    elif x=='16-30 Min':
+        return 24
+    elif x=="30+ Min":
+        return 45
+    else:
+        return None
+
+
+
+from pyspark.sql.functions import col, udf
+from pyspark.sql.types import IntegerType
+
+# Converting function to UDF 
+convertUDF = udf(lambda z: convert_data(z),IntegerType())
+
+
+new_data.groupBy("stop_duration").count().collect()
+
+new_data=new_data.withColumn("stop_duration",convert_col(col("stop_duration")))
+new_data.groupBy("stop_duration").count().collect()
+
+data=[["aryan",30,"B"],
+["aman",35,"C"],
+["kamal",39,"D"]]
+
+
+data
+
+
+
+from pyspark.sql.types import *
+
+mySchema = StructType([StructField('Name', StringType(), True),
+                        StructField('Age', IntegerType(), True),
+                        StructField('City', StringType(), True)])
+   
+
+
+data=spark.createDataFrame(data,schema=mySchema)
+
+data.printSchema()
+
+def city_extension(x):
+    if x=="B":
+        return "Bareilly"
+    elif x=="C":
+        return "Chennai"
+    elif x=="D":
+        return "Delhi"
+    else:
+        return "Unknown"
+
+sample_data=new_data.sample(0.001,100)
+
+sample_data.groupBy("stop_duration").count().collect()
+
+def replace_text(x):
+    if x=="0-15 Min":
+        return 7.5
+    if x=="16-30 Min":
+        return 24
+    if x=="30+ Min":
+        return 45
+    else:
+        return 0
+
+convert_col=udf(lambda x:replace_text(x),StringType())
+
+new_sample=sample_data.withColumn("stopped_duration",convert_col(col("stop_duration")))
+
+new_sample.columns
+
+new_sample=new_sample.drop(col("stop_duration"))
+
+
+
+new_sample.columns
+
+from pyspark.sql.functions import mean
+mean_value=new_sample.agg(mean("stopped_duration")).collect()
+mean_value
+
+Compare the age distributions for each violation.
+
+
+group the data by violations and use the columns for violations and describe.
+
+#to find the age distribution for each violation
+new_data.describe(["violation","driver_age"]).collect()
+
+new_data.columns
+
