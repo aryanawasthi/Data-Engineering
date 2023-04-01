@@ -1,0 +1,635 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[21]:
+
+
+import pyspark
+
+
+# In[22]:
+
+
+from pyspark.sql import SparkSession
+spark=SparkSession.builder.appName("myfirst").master("local[*]").getOrCreate()
+
+
+# In[23]:
+
+
+spark
+
+
+# In[24]:
+
+
+# Laoding the CA data
+data_CA=spark.read.format("csv").option("path","/home/aryan/Music/YouTube_Analysis_Data/CAvideos.csv").option("header",True).option("inferSchema",True).load()
+
+
+# In[17]:
+
+
+
+
+
+# In[1]:
+
+
+data_json=spark.read.format("json").option("path","/home/aryan/Music/YouTube_Analysis_Data/CA_category_id.json").option("inferSchema",True).option("multiline",True).load()
+
+
+# In[2]:
+
+
+data_dict={
+ "kind": "youtube#videoCategoryListResponse",
+ "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/1v2mrzYSYG6onNLt2qTj13hkQZk\"",
+ "items": [
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/Xy1mB4_yLrHy_BmKmPBggty2mZQ\"",
+   "id": "1",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Film & Animation",
+    "assignable": True
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/UZ1oLIIz2dxIhO45ZTFR3a3NyTA\"",
+   "id": "2",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Autos & Vehicles",
+    "assignable": True
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/nqRIq97-xe5XRZTxbknKFVe5Lmg\"",
+   "id": "10",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Music",
+    "assignable": True
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/HwXKamM1Q20q9BN-oBJavSGkfDI\"",
+   "id": "15",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Pets & Animals",
+    "assignable": True
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/9GQMSRjrZdHeb1OEM1XVQ9zbGec\"",
+   "id": "17",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Sports",
+    "assignable": True
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/FJwVpGCVZ1yiJrqZbpqe68Sy_OE\"",
+   "id": "18",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Short Movies",
+    "assignable": False
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/M-3iD9dwK7YJCafRf_DkLN8CouA\"",
+   "id": "19",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Travel & Events",
+    "assignable": True
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/WmA0qYEfjWsAoyJFSw2zinhn2wM\"",
+   "id": "20",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Gaming",
+    "assignable": True
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/EapFaGYG7K0StIXVf8aba249tdM\"",
+   "id": "21",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Videoblogging",
+    "assignable": False
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/xId8RX7vRN8rqkbYZbNIytUQDRo\"",
+   "id": "22",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "People & Blogs",
+    "assignable": True
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/G9LHzQmx44rX2S5yaga_Aqtwz8M\"",
+   "id": "23",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Comedy",
+    "assignable": True
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/UVB9oxX2Bvqa_w_y3vXSLVK5E_s\"",
+   "id": "24",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Entertainment",
+    "assignable": True
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/QiLK0ZIrFoORdk_g2l_XR_ECjDc\"",
+   "id": "25",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "News & Politics",
+    "assignable": True
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/r6Ck6Z0_L0rG37VJQR200SGNA_w\"",
+   "id": "26",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Howto & Style",
+    "assignable": True
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/EoYkczo9I3RCf96RveKTOgOPkUM\"",
+   "id": "27",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Education",
+    "assignable": True
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/w5HjcTD82G_XA3xBctS30zS-JpQ\"",
+   "id": "28",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Science & Technology",
+    "assignable": True
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/lL7uWDr_071CHxifjYG1tJrp4Uo\"",
+   "id": "30",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Movies",
+    "assignable": False
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/WnuVfjO-PyFLO7NTRQIbrGE62nk\"",
+   "id": "31",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Anime/Animation",
+    "assignable": False
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/ctpH2hGA_UZ3volJT_FTlOg9M00\"",
+   "id": "32",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Action/Adventure",
+    "assignable": False
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/L0kR3-g1BAo5UD1PLVbQ7LkkDtQ\"",
+   "id": "33",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Classics",
+    "assignable": False
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/pUZOAC_s9sfiwar639qr_wAB-aI\"",
+   "id": "34",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Comedy",
+    "assignable": False
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/Xb5JLhtyNRN3AQq021Ds-OV50Jk\"",
+   "id": "35",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Documentary",
+    "assignable": False
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/u8WXzF4HIhtEi805__sqjuA4lEk\"",
+   "id": "36",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Drama",
+    "assignable": False
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/D04PP4Gr7wc4IV_O9G66Z4A8KWQ\"",
+   "id": "37",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Family",
+    "assignable": False
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/i5-_AceGXQCEEMWU0V8CcQm_vLQ\"",
+   "id": "38",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Foreign",
+    "assignable": False
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/rtlxd0zOixA9QHdIZB26-St5qgQ\"",
+   "id": "39",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Horror",
+    "assignable": False
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/N1TrDFLRppxZgBowCJfJCvh0Dpg\"",
+   "id": "40",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Sci-Fi/Fantasy",
+    "assignable": False
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/7UMGi6zRySqXopr_rv4sZq6Za2E\"",
+   "id": "41",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Thriller",
+    "assignable": False
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/RScXhi324h8usyIetreAVb-uKeM\"",
+   "id": "42",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Shorts",
+    "assignable": False
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/0n9MJVCDLpA8q7aiGVrFsuFsd0A\"",
+   "id": "43",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Shows",
+    "assignable": False
+   }
+  },
+  {
+   "kind": "youtube#videoCategory",
+   "etag": "\"ld9biNPKjAjgjV7EZ4EKeEGrhao/x5NxSf5fz8hn4loSN4rvhwzD_pY\"",
+   "id": "44",
+   "snippet": {
+    "channelId": "UCBR8-60-B28hp2BmDPdntcQ",
+    "title": "Trailers",
+    "assignable": False
+   }
+  }
+ ]
+}
+
+
+# In[ ]:
+
+
+
+
+
+# In[3]:
+
+
+def getting_category_name(dict_name):
+ 
+    b={}
+    for i in range(len(data_dict["items"])):
+        id=int(data_dict["items"][i]["id"])
+        #print(type(id))
+        value=data_dict["items"][i]["snippet"]["title"]
+        if "id" not in b.keys():
+            b[id]=value
+    print(b)        
+    return b
+
+        
+dict_category=getting_category_name(data_dict)
+
+
+# In[5]:
+
+
+import pandas as pd
+data_csv=pd.read_csv("/home/aryan/Music/YouTube_Analysis_Data/CAvideos.csv")
+
+
+# In[6]:
+
+
+# Let us find out that on the basis of likes that which categroy gives the best liked vedions
+data_csv=data_csv.sort_values("likes",ascending=False)
+
+
+# In[7]:
+
+
+# Finding the values of finding the values.
+import datetime as dt
+
+
+# In[8]:
+
+
+cat_ids=data_csv.category_id.unique()
+cat_ids
+
+
+# In[9]:
+
+
+from pyspark.sql.functions import col, pandas_udf
+
+
+from pyspark.sql.types import StringType,IntegerType
+
+
+# In[10]:
+
+
+# using the dictionary of  python we will take the category ids as input and for every input ids we can return the value
+def get_vedio_category_name(series,dict_category):
+    for k,v in dict_category.items():
+        if k=="series":
+            return value
+
+
+# In[105]:
+
+
+udf_category=pandas_udf(get_vedio_category_name,returnType=StringType())
+
+
+# In[11]:
+
+
+data_csv["category_Name"]=data_csv["category_id"].map(dict_category)
+
+
+# # Now Let us find some of the more interesting insights such as ?
+# # How many days a vedio takes for every category to be on top trending page?
+# 
+# # For this  we have two dates one is trending_date and other is publish_time so we will try to find how many days took for every vedio to get famous or in treing data
+# 
+# # Let us develop a function to for getting the reuired datetime and days difference
+# 
+# # Since the data is in the form of object we have to use the regex expresiion
+# 
+
+# In[12]:
+
+
+import datetime as dt
+
+
+# In[13]:
+
+
+def convert_datetime_to_date(datetime_series):
+    import re
+    regex_pattern=re.compile(f"[\d]+-[\d]+-[\d]+")
+    res=str(re.findall(regex_pattern,"2018-05-18T09:00:02.000Z"))
+    date="".join(res[2:12])
+    return date
+
+
+# In[14]:
+
+
+convert_datetime=pandas_udf(convert_datetime_to_date,returnType=StringType())
+
+
+# In[15]:
+
+
+def add_1(x):
+    return x+1
+
+
+# In[16]:
+
+
+add_num=pandas_udf(add_1,returnType=IntegerType())
+
+
+# In[17]:
+
+
+data_csv.publish_time=data_csv.category_id.apply(convert_datetime_to_date)
+
+
+# In[131]:
+
+
+data_csv.publish_time
+
+
+# In[18]:
+
+
+data_csv["publish_time"] = data_csv["publish_time"].astype("datetime64[ns]")
+
+
+# In[19]:
+
+
+def convert_to_date(data):
+    res=data.split(".")
+    new_pattern="20{}-{}-{}".format(res[0],res[2],res[1])
+    return new_pattern
+convert_to_date("18.23.05")
+
+
+# In[20]:
+
+
+data_csv.trending_date=data_csv.trending_date.map(lambda x: convert_to_date(x))
+
+
+# In[21]:
+
+
+data_csv["trending_date"]=data_csv.trending_date.astype("datetime64[ns]")
+
+
+# In[22]:
+
+
+data_csv.dtypes
+
+
+# In[38]:
+
+
+data_csv["day_diff"]=abs(data_csv.trending_date-data_csv.publish_time)
+
+
+# In[39]:
+
+
+data_csv.dtypes
+
+
+# In[42]:
+
+
+# Finding the average time taken for each category for the youtube vedio  to get trending
+data_csv.groupby("category_Name")["day_diff"].mean().sort_values(ascending=False)
+
+# Here we can understand that approximatelt 90 days are required for any song to be at top trending date.
+
+
+# In[47]:
+
+
+# Let us find the earning of each youtube vedion and earning of every category and then order the same.
+# For finding the earning we have to consider the idea that for every 1000 views we are getting a $1
+data_csv["total_income($)"]=data_csv.views.map(lambda x : x/1000)
+
+
+# In[55]:
+
+
+data_csv.reset_index().head(1)
+
+
+# In[93]:
+
+
+# Let us find the aggregated income of each category
+data_cat_income=pd.DataFrame(data_csv.groupby("category_Name")["total_income($)"].sum().to_frame(name='count').reset_index())
+
+
+# In[99]:
+
+
+data_cat_income["count"]=data_cat_income["count"].astype("int64")
+
+
+# In[100]:
+
+
+# Now Finding the value we will have to find the 
+data_cat_income
+
+
+# In[101]:
+
+
+data_csv
+
+
+# In[107]:
+
+
+# Let us find how that which vedio remained at the tredning date for maximu time"
+data_csv['row_number'] = data_csv.reset_index().index
+data_csv.columns
+
+
+# In[128]:
+
+
+# Find about how much a vedio is trending
+data_cat_ord=pd.DataFrame(data_csv.groupby(["video_id"])["trending_date"].count().sort_values(ascending=False)).reset_index()
+data_cat_ord
+
+
+# data_cat_ord`
+
+# In[129]:
+
+
+""" Let us find the criteria from the label Category for which we have maximum orders such as  we hae a vedio w
+with a a vedio_id 1 and likes 60000000 and tags such as finding "mixed-value-finding-count-love"
+"""
+
+
+# In[130]:
+
+
+data_csv
+
+
+# In[ ]:
+
+
+
